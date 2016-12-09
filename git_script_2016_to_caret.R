@@ -34,7 +34,7 @@ gc200matlab<-read.table('gc.mat')$V1
 load('/home/mikhail/Documents/Script_2016_all/spline_dataset_pro.Rdata')
 load('/home/mikhail/Documents/Script_2016_all/spline_dataset_notpro.Rdata')
 load('/home/mikhail/Documents/Script_2016_all/spline_dataset_gen.Rdata')
-load('/home/mikhail/Documents/Script_2016_all/spline_dataset_isl.Rdata')
+load('spline_dataset_isl.Rdata')
 load('dataset_lowscore.Rdata')
 
 # extracting data on all promoters and on experimentaly found ones - including previosely calculated electrostatic potential profiles
@@ -302,7 +302,7 @@ colnames(to_pca_5components_4props)<-NULL
 
 
 #############3 #scale =F?
-princ.return.5comps.4props <- prcomp(to_pca_5components_4props, scale=F)
+princ.return.5comps.4props <- prcomp(to_pca_5components_4props, scale=T)
 
 #saving prcomp output 
 save(princ.return.5comps.4props, file='princ.return.5comps.4props.Rdata')
@@ -421,6 +421,7 @@ fit_promoters_vs_lowscore <- train(factor_to_promoters_vs_lowscore ~ .,
                                    trControl = fitControl,
                                    metric = "Kappa"
 )
+
 predictionClasses_promoters_vs_lowscore <- predict(fit_promoters_vs_lowscore, newdata = testing)
 predictionProb_promoters_vs_lowscore <- predict(fit_promoters_vs_lowscore, newdata = testing, type ="prob")
 confusionMatrix_promoters_vs_lowscore <- confusionMatrix(data = predictionClasses_promoters_vs_lowscore, testing$factor_to_promoters_vs_lowscore)
