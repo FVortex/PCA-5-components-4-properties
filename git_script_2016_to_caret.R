@@ -9,7 +9,7 @@ library(R.matlab)
 library(seqinr)
 
 ## calculation of dynamical properties (activation energy and size of open states) from within R using 2 octave script
-#writing in R E.coli K12 MG1655 genome from fasta file (must be copied to the working directory)
+#reading in R E.coli K12 MG1655 genome from fasta file (must be copied to the working directory)
 
 e.coli_U00096.2<-unlist(read.fasta('e.coli_U00096.2.fasta', seqonly = T))
 #saving the genome version to .txt for further usage by octave scripts
@@ -22,7 +22,8 @@ system('octave dynamic_characteristics_vec_cumsum_read_txt.m')
 
 system('octave dynamic_characteristics_vec_cumsum_read_txt_additional.m')
 
-#reading in files created by octave scripts for activation energy and size of open states, and Gc-content (200 bp-long sliding window)
+#reading in files created by octave scripts for activation energy and size of open states, and GC-content (200 bp-long sliding window)
+#since GC-content for both strands is equal only 1 strand profile is loaded. Particular reverse strand sequences profiles are reversed below
 
 E01<-read.table('E01.mat')$V1
 E02<-read.table('E02.mat')$V1
@@ -31,9 +32,9 @@ d2<-read.table('d2.mat')$V1
 gc200matlab<-read.table('gc.mat')$V1
 
 #loading data on sequences of different types (promoters, non-promoters, genes, islands, and lowscore) from .Rdata files (must be copied separetely)
-load('/home/mikhail/Documents/Script_2016_all/spline_dataset_pro.Rdata')
-load('/home/mikhail/Documents/Script_2016_all/spline_dataset_notpro.Rdata')
-load('/home/mikhail/Documents/Script_2016_all/spline_dataset_gen.Rdata')
+load('spline_dataset_pro.Rdata')
+load('spline_dataset_notpro.Rdata')
+load('spline_dataset_gen.Rdata')
 load('spline_dataset_isl.Rdata')
 load('dataset_lowscore.Rdata')
 
@@ -283,7 +284,7 @@ rownames(lowscorempots)<-paste0('Lowscore_', 1:nrow(lowscoreaeos1))
 rownames(lowscoregc200)<-paste0('Lowscore_', 1:nrow(lowscoreaeos1))
 
 
-#Merging datasets. Normalizing data
+#Merging datasets. Scaling data
 
 to_pca_5components_4props<-rbind(cbind(scale(aeos1), scale(aeos3), scale(mpots), scale(gc200)),
                                  cbind(scale(notaeos1), scale(notaeos3), scale(notmpots), scale(notgc200)),
@@ -296,7 +297,7 @@ save(to_pca_5components_4props, file='to_pca_5components_4props.Rdata')
 
 
 #setting sequences groups
-habillage_5components_4props<-c(rep('P', length(exp_names)), rep('N', length(dataset_notpro)), rep('G', length(dataset_gen)), rep('I', length(dataset_isl)), rep('L', 2000))
+habillage_5components_4props<-c(rep('Promoters', length(exp_names)), rep('Non-promoters', length(dataset_notpro)), rep('Genes', length(dataset_gen)), rep('Islands', length(dataset_isl)), rep('Lowscore', 2000))
 
 colnames(to_pca_5components_4props)<-NULL
 
@@ -344,7 +345,7 @@ colnames(pcs.from.var)<-1:ncol(pcs.from.var)
 #renaming the variable
 mixt_5comps_after_pca_on_4_props_ae_size_mpots_gc200<- pcs.from.var
 save(mixt_5comps_after_pca_on_4_props_ae_size_mpots_gc200, file='new_no_factor_8XII_mixt_5comps_after_pca_on_4_props_ae_size_mpots_gc200.Rdata')
-#geneal PCA results visualization
+#general PCA results visualization
 
 library(factoextra)
 
