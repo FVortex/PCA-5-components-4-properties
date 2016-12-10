@@ -28,12 +28,13 @@ E01<-read.table('E01.mat')$V1
 E02<-read.table('E02.mat')$V1
 d1<-read.table('d1.mat')$V1
 d2<-read.table('d2.mat')$V1
-gc200matlab<-read.table('gc.mat')$V1
+gc200matlab<-read.table('gc.mat')$V1 #for forward strand
+gc200matlab_reverse<-rev(gc200matlab)
 
 #loading data on sequences of different types (promoters, non-promoters, genes, islands, and lowscore) from .Rdata files (must be copied separetely)
-load('/home/mikhail/Documents/Script_2016_all/spline_dataset_pro.Rdata')
-load('/home/mikhail/Documents/Script_2016_all/spline_dataset_notpro.Rdata')
-load('/home/mikhail/Documents/Script_2016_all/spline_dataset_gen.Rdata')
+load('spline_dataset_pro.Rdata')
+load('spline_dataset_notpro.Rdata')
+load('spline_dataset_gen.Rdata')
 load('spline_dataset_isl.Rdata')
 load('dataset_lowscore.Rdata')
 
@@ -77,7 +78,7 @@ for (i in 1:length(exp_tsss)) {
     #aeos2reverse<-rbind(aeos2reverse, matr1[(as.numeric(exp_tsss[i])-150):(as.numeric(exp_tsss[i])+50),2])
     aeos3reverse<-rbind(aeos3reverse, d2[(as.numeric(exp_tsss[i])-150):(as.numeric(exp_tsss[i])+50)])
     #aeos4reverse<-rbind(aeos4reverse, matr1[(as.numeric(exp_tsss[i])-150):(as.numeric(exp_tsss[i])+50),4])
-    gc200reverse<-rbind(gc200reverse, rev(gc200matlab[(as.numeric(exp_tsss[i])-150):(as.numeric(exp_tsss[i])+50)]))
+    gc200reverse<-rbind(gc200reverse, (gc200matlab_reverse[(as.numeric(exp_tsss[i])-150):(as.numeric(exp_tsss[i])+50)]))
     }
 }
 #merging matrices for forward and reverse strands  together
@@ -122,7 +123,7 @@ for (i in 1:length(nottsss)) {
     #notaeos2reverse<-rbind(notaeos2reverse, matr1[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50),2])
     notaeos3reverse<-rbind(notaeos3reverse, d2[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50)])
     #notaeos4reverse<-rbind(notaeos4reverse, matr1[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50),4])
-    notgc200reverse<-rbind(notgc200reverse, rev(gc200matlab[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50)]))
+    notgc200reverse<-rbind(notgc200reverse, (gc200matlab_reverse[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50)]))
     }
 }
 
@@ -133,7 +134,7 @@ notaeos3<-notaeos3forward
 #notaeos4<-notaeos4forward
 notgc200<-notgc200forward
 
-# # #genes. data axtracion
+# # #genes. data extracion
 gen_names<-names(dataset_gen)
 gentsss<-c()
 genseqs<-c
@@ -163,7 +164,7 @@ for (i in 1:length(dataset_gen)) {
     # genaeos2reverse<-rbind(genaeos2reverse, matr1[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50),2])
     genaeos3reverse<-rbind(genaeos3reverse, d2[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50)])
     #genaeos4reverse<-rbind(genaeos4reverse, matr1[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50),4])
-    gengc200reverse<-rbind(gengc200reverse, rev(gc200matlab[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50)]))
+    gengc200reverse<-rbind(gengc200reverse, (gc200matlab_reverse[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50)]))
     }
 }
 
@@ -203,7 +204,7 @@ for (i in 1:length(dataset_isl)) {
     # islaeos2reverse<-rbind(islaeos2reverse, matr1[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50),2])
     islaeos3reverse<-rbind(islaeos3reverse, d2[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50)])
     #islaeos4reverse<-rbind(islaeos4reverse, matr1[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50),4])
-    islgc200reverse<-rbind(islgc200reverse, rev(gc200matlab[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50)]))
+    islgc200reverse<-rbind(islgc200reverse, (gc200matlab_reverse[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50)]))
   }
 }
 
@@ -245,7 +246,7 @@ for (i in 1:2000) {
     # lowscoreaeos2reverse<-rbind(lowscoreaeos2reverse, matr1[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50),2])
     lowscoreaeos3reverse<-rbind(lowscoreaeos3reverse, d2[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50)])
     #lowscoreaeos4reverse<-rbind(lowscoreaeos4reverse, matr1[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50),4])
-    lowscoregc200reverse<-rbind(lowscoregc200reverse, rev(gc200matlab[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50)]))
+    lowscoregc200reverse<-rbind(lowscoregc200reverse, (gc200matlab_reverse[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50)]))
   }
 }
 
