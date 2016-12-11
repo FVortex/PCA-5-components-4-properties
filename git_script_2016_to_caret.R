@@ -73,9 +73,9 @@ for (i in 1:length(exp_tsss)) {
     #aeos4forward<-rbind(aeos4forward, matr1[(as.numeric(exp_proms[i,3])-150):(as.numeric(exp_proms[i,3])+50),4])            
     gc200forward<-rbind(gc200forward, gc200matlab[(as.numeric(exp_tsss[i])-150):(as.numeric(exp_tsss[i])+50)])
      } else {
-    aeos1reverse<-rbind(aeos1reverse, E02[(as.numeric(exp_tsss[i])-150):(as.numeric(exp_tsss[i])+50)])
+    aeos1reverse<-rbind(aeos1reverse, E02[(as.numeric(exp_tsss[i])-50):(as.numeric(exp_tsss[i])+150)])
     #aeos2reverse<-rbind(aeos2reverse, matr1[(as.numeric(exp_tsss[i])-150):(as.numeric(exp_tsss[i])+50),2])
-    aeos3reverse<-rbind(aeos3reverse, d2[(as.numeric(exp_tsss[i])-150):(as.numeric(exp_tsss[i])+50)])
+    aeos3reverse<-rbind(aeos3reverse, d2[(as.numeric(exp_tsss[i])-50):(as.numeric(exp_tsss[i])+150)])
     #aeos4reverse<-rbind(aeos4reverse, matr1[(as.numeric(exp_tsss[i])-150):(as.numeric(exp_tsss[i])+50),4])
     gc200reverse<-rbind(gc200reverse, (gc200matlab[(as.numeric(exp_tsss[i])-50):(as.numeric(exp_tsss[i])+150)]))
     }
@@ -118,9 +118,9 @@ for (i in 1:length(nottsss)) {
     #notaeos4forward<-rbind(notaeos4forward, matr1[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50),4])			
     notgc200forward<-rbind(notgc200forward, gc200matlab[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50)])
           } else {
-    notaeos1reverse<-rbind(notaeos1reverse, E02[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50)])
+    notaeos1reverse<-rbind(notaeos1reverse, E02[(as.numeric(nottsss[i])-50):(as.numeric(nottsss[i])+150)])
     #notaeos2reverse<-rbind(notaeos2reverse, matr1[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50),2])
-    notaeos3reverse<-rbind(notaeos3reverse, d2[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50)])
+    notaeos3reverse<-rbind(notaeos3reverse, d2[(as.numeric(nottsss[i])-50):(as.numeric(nottsss[i])+150)])
     #notaeos4reverse<-rbind(notaeos4reverse, matr1[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50),4])
     notgc200reverse<-rbind(notgc200reverse, (gc200matlab[(as.numeric(nottsss[i])-50):(as.numeric(nottsss[i])+150)]))
     }
@@ -159,9 +159,9 @@ for (i in 1:length(dataset_gen)) {
     #  genaeos4forward<-rbind(genaeos4forward, matr1[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50),4])            
     gengc200forward<-rbind(gengc200forward, gc200matlab[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50)])
         } else {
-    genaeos1reverse<-rbind(genaeos1reverse, E02[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50)])
+    genaeos1reverse<-rbind(genaeos1reverse, E02[(as.numeric(gentsss[i])-50):(as.numeric(gentsss[i])+150)])
     # genaeos2reverse<-rbind(genaeos2reverse, matr1[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50),2])
-    genaeos3reverse<-rbind(genaeos3reverse, d2[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50)])
+    genaeos3reverse<-rbind(genaeos3reverse, d2[(as.numeric(gentsss[i])-50):(as.numeric(gentsss[i])+150)])
     #genaeos4reverse<-rbind(genaeos4reverse, matr1[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50),4])
     gengc200reverse<-rbind(gengc200reverse, (gc200matlab[(as.numeric(gentsss[i])-50):(as.numeric(gentsss[i])+150)]))
     }
@@ -199,9 +199,9 @@ for (i in 1:length(dataset_isl)) {
     #  islaeos4forward<-rbind(islaeos4forward, matr1[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50),4])            
     islgc200forward<-rbind(islgc200forward, gc200matlab[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50)])
   } else {
-    islaeos1reverse<-rbind(islaeos1reverse, E02[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50)])
+    islaeos1reverse<-rbind(islaeos1reverse, E02[(as.numeric(isltsss[i])-50):(as.numeric(isltsss[i])+150)])
     # islaeos2reverse<-rbind(islaeos2reverse, matr1[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50),2])
-    islaeos3reverse<-rbind(islaeos3reverse, d2[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50)])
+    islaeos3reverse<-rbind(islaeos3reverse, d2[(as.numeric(isltsss[i])-50):(as.numeric(isltsss[i])+150)])
     #islaeos4reverse<-rbind(islaeos4reverse, matr1[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50),4])
     islgc200reverse<-rbind(islgc200reverse, (gc200matlab[(as.numeric(isltsss[i])-50):(as.numeric(isltsss[i])+150)]))
   }
@@ -241,9 +241,9 @@ for (i in 1:2000) {
     #  lowscoreaeos4forward<-rbind(lowscoreaeos4forward, matr1[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50),4])            
     lowscoregc200forward<-rbind(lowscoregc200forward, gc200matlab[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50)])
   } else {
-    lowscoreaeos1reverse<-rbind(lowscoreaeos1reverse, E02[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50)])
+    lowscoreaeos1reverse<-rbind(lowscoreaeos1reverse, E02[(as.numeric(lowscoretsss[i])-50):(as.numeric(lowscoretsss[i])+150)])
     # lowscoreaeos2reverse<-rbind(lowscoreaeos2reverse, matr1[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50),2])
-    lowscoreaeos3reverse<-rbind(lowscoreaeos3reverse, d2[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50)])
+    lowscoreaeos3reverse<-rbind(lowscoreaeos3reverse, d2[(as.numeric(lowscoretsss[i])-50):(as.numeric(lowscoretsss[i])+150)])
     #lowscoreaeos4reverse<-rbind(lowscoreaeos4reverse, matr1[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50),4])
     lowscoregc200reverse<-rbind(lowscoregc200reverse, (gc200matlab[(as.numeric(lowscoretsss[i])-50):(as.numeric(lowscoretsss[i])+150)]))
   }
