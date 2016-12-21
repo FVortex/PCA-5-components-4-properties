@@ -26,9 +26,9 @@ system('octave dynamic_characteristics_vec_cumsum_read_txt_additional.m')
 #since GC-content for both strands is equal only 1 strand profile is loaded. Particular reverse strand sequences profiles are reversed below
 
 E01<-read.table('E01.mat')$V1
-E02<-read.table('E02.mat')$V1
+E02<-(read.table('E02.mat')$V1)
 d1<-read.table('d1.mat')$V1
-d2<-read.table('d2.mat')$V1
+d2<-(read.table('d2.mat')$V1)
 gc200matlab<-read.table('gc.mat')$V1 #for forward strand
 
 #loading data on sequences of different types (promoters, non-promoters, genes, islands, and lowscore) from .Rdata files (must be copied separetely)
@@ -292,6 +292,11 @@ to_pca_5components_4props<-rbind(cbind(scale(aeos1), scale(aeos3), scale(mpots),
                                  cbind(scale(islaeos1), scale(islaeos3), scale(islmpots), scale(islgc200)),
                                  cbind(scale(lowscoreaeos1), scale(lowscoreaeos3), scale(lowscorempots), scale(lowscoregc200))
 )
+
+#EP only
+#########to_pca_mpots<-rbind(scale(mpots), scale(notmpots), scale(genmpots), scale(islmpots), scale(lowscorempots))
+
+#to_pca_5components_4props<-to_pca_mpots
 # saving the initial matrix for 5 components, 4 properties
 save(to_pca_5components_4props, file='to_pca_5components_4props.Rdata')
 
@@ -303,7 +308,8 @@ colnames(to_pca_5components_4props)<-NULL
 
 
 #############3 #scale =F?
-princ.return.5comps.4props <- prcomp(to_pca_5components_4props, scale=T)
+set.seed(999)
+princ.return.5comps.4props <- prcomp(to_pca_5components_4props, scale=T, center = T)
 
 #saving prcomp output 
 save(princ.return.5comps.4props, file='princ.return.5comps.4props.Rdata')
@@ -420,7 +426,7 @@ fit_promoters_vs_lowscore <- train(factor_to_promoters_vs_lowscore ~ .,
                                    preProcess=c("center", "scale"),
                                    tuneLength = 15,
                                    trControl = fitControl,
-                                   metric = "Kappa"
+                                   metric = "ROC"
 )
 
 predictionClasses_promoters_vs_lowscore <- predict(fit_promoters_vs_lowscore, newdata = testing)
