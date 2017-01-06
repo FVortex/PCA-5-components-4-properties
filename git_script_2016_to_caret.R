@@ -9,27 +9,86 @@ library(R.matlab)
 library(seqinr)
 
 ## calculation of dynamical properties (activation energy and size of open states) from within R using 2 octave script
-#reading in R E.coli K12 MG1655 genome from fasta file (must be copied to the working directory)
+#writing in R E.coli K12 MG1655 genome from fasta file (must be copied to the working directory)
 
-e.coli_U00096.2<-unlist(read.fasta('e.coli_U00096.2.fasta', seqonly = T))
-#saving the genome version to .txt for further usage by octave scripts
-writeLines(e.coli_U00096.2, 'e.coli_U00096.2.txt')
-# check-up (whether the genome has right length and only 4 nucleotides composition)
-check<-readLines('e.coli_U00096.2.txt')
+e.coli_U00096.2<-unlist(read.fasta('e.coli_U00096.2.fasta',as.string = F, seqonly = T))
 
-##running octave scripts; the second one is for reading into octave genome in .txt format
-system('octave dynamic_characteristics_vec_cumsum_read_txt.m')
+#tranformation genome into character since for function below usage
+e.coli_U00096.2_char<-unlist(strsplit(e.coli_U00096.2, ''))
+#creating function for dynamical properties calculation
 
-system('octave dynamic_characteristics_vec_cumsum_read_txt_additional.m')
 
-#reading in files created by octave scripts for activation energy and size of open states, and GC-content (200 bp-long sliding window)
-#since GC-content for both strands is equal only 1 strand profile is loaded. Particular reverse strand sequences profiles are reversed below
+dynchars<-function(seq, interval_size) {
+  if (missing(seq))
+    stop("Need to specify sequence (as a vector of chars)")
+  
+  if (missing(interval_size))
+    stop("Need to specify interval size")
+  
+  if(!is.character(seq))
+    stop("Sequence must be a character vector containing A, C, G, T letters only")
+  
+  seq<-toupper(seq)
+  seq<-c(seq, seq[2:(interval_size)])
+  
+  a<-3.4*10^(-10)
+  I<-c(7.6, 4.8, 8.2, 4.1)*10^(-44)
+  K<-c(227, 155, 220, 149)*10^(-20)
+  V<-c(2.09, 1.43, 3.12, 2.12)*10^(-20)
+  tau<-c(127, 99, 140, 84)
+  
+  csA<-cumsum(seq=='A') 
+  csT<-cumsum(seq=='T')
+  csG<-cumsum(seq=='G')
+  csC<-cumsum(seq=='C')
+  
+  countA = csA[interval_size:length(csA)]-c(0, csA[1:(length(csA)-interval_size)])
+  countT = csT[interval_size:length(csT)]-c(0, csT[1:(length(csT)-interval_size)])
+  countG = csG[interval_size:length(csG)]-c(0, csG[1:(length(csG)-interval_size)])
+  countC = csC[interval_size:length(csC)]-c(0, csC[1:(length(csC)-interval_size)])
+  
+  M<-cbind(countA, countT, countG, countC)/interval_size
+  M_comp<-cbind(countT, countA, countC, countG)/interval_size
+  M_comp<-apply(t(M_comp),1,rev) 
+  Is<-as.numeric(M%*%I)#! numeric conversion
+  Ks<-as.numeric(M%*%K)
+  Vs<-as.numeric(M%*%V)
+  
+  E01<-(8*(Ks*Vs)^0.5)* 6E23 / 4184
+  d1<-((Ks*a^2)/Vs)^(0.5)/a;
+  c1<-(Ks*a^2/Is)^0.5
+  m1<-E01/c1/6.011E-26
+  taus1<-as.numeric(M%*%tau) #!as.numeric conversion
+  gc = M[,3] + M[,4]
+  
+  Is<-as.numeric(M%*%I)#! numeric conversion
+  Ks<-as.numeric(M%*%K)
+  Vs<-as.numeric(M%*%V)
+  
+  
+  E02<- 8*(Ks*Vs)^0.5  * 6E23 / 4184;
+  d2<-((Ks*a^2)/Vs)^(0.5)/a;
+  c2<-(Ks*a^2/Is)^0.5;
+  m2<-E02/c2/6.011E-26;
+  taus2<-as.numeric(M_comp%*%tau)
+  
+  
+  dynchars_return<-list(E01=E01, d1=d1, c1=c1, m1=m1, taus1=taus1, gc=gc, E02=E02, d2=d2, c2=c2, m2=m2, taus2=taus2, gc=gc)
+  
+  return(dynchars_return)
+  
+}
 
-E01<-read.table('E01.mat')$V1
-E02<-(read.table('E02.mat')$V1)
-d1<-read.table('d1.mat')$V1
-d2<-(read.table('d2.mat')$V1)
-gc200matlab<-read.table('gc.mat')$V1 #for forward strand
+#calculation the properties for a given genome with sliding window 200 nt
+
+dynchars_output<-dynchars(e.coli_U00096.2_char, 200)
+E01<-dynchars_output$E01
+E02<-dynchars_output$E02
+
+d1<-dynchars_output$d1
+d2<-dynchars_output$d2
+
+gc200matlab<-dynchars_output$gc #name of the variable is from before
 
 #loading data on sequences of different types (promoters, non-promoters, genes, islands, and lowscore) from .Rdata files (must be copied separetely)
 load('spline_dataset_pro.Rdata')
@@ -74,9 +133,9 @@ for (i in 1:length(exp_tsss)) {
     #aeos4forward<-rbind(aeos4forward, matr1[(as.numeric(exp_proms[i,3])-150):(as.numeric(exp_proms[i,3])+50),4])            
     gc200forward<-rbind(gc200forward, gc200matlab[(as.numeric(exp_tsss[i])-150):(as.numeric(exp_tsss[i])+50)])
      } else {
-    aeos1reverse<-rbind(aeos1reverse, E02[(as.numeric(exp_tsss[i])-50):(as.numeric(exp_tsss[i])+150)])
+    aeos1reverse<-rbind(aeos1reverse, E02[(as.numeric(exp_tsss[i])-150):(as.numeric(exp_tsss[i])+50)])
     #aeos2reverse<-rbind(aeos2reverse, matr1[(as.numeric(exp_tsss[i])-150):(as.numeric(exp_tsss[i])+50),2])
-    aeos3reverse<-rbind(aeos3reverse, d2[(as.numeric(exp_tsss[i])-50):(as.numeric(exp_tsss[i])+150)])
+    aeos3reverse<-rbind(aeos3reverse, d2[(as.numeric(exp_tsss[i])-150):(as.numeric(exp_tsss[i])+50)])
     #aeos4reverse<-rbind(aeos4reverse, matr1[(as.numeric(exp_tsss[i])-150):(as.numeric(exp_tsss[i])+50),4])
     gc200reverse<-rbind(gc200reverse, (gc200matlab[(as.numeric(exp_tsss[i])-50):(as.numeric(exp_tsss[i])+150)]))
     }
@@ -119,9 +178,9 @@ for (i in 1:length(nottsss)) {
     #notaeos4forward<-rbind(notaeos4forward, matr1[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50),4])			
     notgc200forward<-rbind(notgc200forward, gc200matlab[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50)])
           } else {
-    notaeos1reverse<-rbind(notaeos1reverse, E02[(as.numeric(nottsss[i])-50):(as.numeric(nottsss[i])+150)])
+    notaeos1reverse<-rbind(notaeos1reverse, E02[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50)])
     #notaeos2reverse<-rbind(notaeos2reverse, matr1[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50),2])
-    notaeos3reverse<-rbind(notaeos3reverse, d2[(as.numeric(nottsss[i])-50):(as.numeric(nottsss[i])+150)])
+    notaeos3reverse<-rbind(notaeos3reverse, d2[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50)])
     #notaeos4reverse<-rbind(notaeos4reverse, matr1[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50),4])
     notgc200reverse<-rbind(notgc200reverse, (gc200matlab[(as.numeric(nottsss[i])-50):(as.numeric(nottsss[i])+150)]))
     }
@@ -160,9 +219,9 @@ for (i in 1:length(dataset_gen)) {
     #  genaeos4forward<-rbind(genaeos4forward, matr1[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50),4])            
     gengc200forward<-rbind(gengc200forward, gc200matlab[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50)])
         } else {
-    genaeos1reverse<-rbind(genaeos1reverse, E02[(as.numeric(gentsss[i])-50):(as.numeric(gentsss[i])+150)])
+    genaeos1reverse<-rbind(genaeos1reverse, E02[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50)])
     # genaeos2reverse<-rbind(genaeos2reverse, matr1[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50),2])
-    genaeos3reverse<-rbind(genaeos3reverse, d2[(as.numeric(gentsss[i])-50):(as.numeric(gentsss[i])+150)])
+    genaeos3reverse<-rbind(genaeos3reverse, d2[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50)])
     #genaeos4reverse<-rbind(genaeos4reverse, matr1[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50),4])
     gengc200reverse<-rbind(gengc200reverse, (gc200matlab[(as.numeric(gentsss[i])-50):(as.numeric(gentsss[i])+150)]))
     }
@@ -200,9 +259,9 @@ for (i in 1:length(dataset_isl)) {
     #  islaeos4forward<-rbind(islaeos4forward, matr1[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50),4])            
     islgc200forward<-rbind(islgc200forward, gc200matlab[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50)])
   } else {
-    islaeos1reverse<-rbind(islaeos1reverse, E02[(as.numeric(isltsss[i])-50):(as.numeric(isltsss[i])+150)])
+    islaeos1reverse<-rbind(islaeos1reverse, E02[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50)])
     # islaeos2reverse<-rbind(islaeos2reverse, matr1[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50),2])
-    islaeos3reverse<-rbind(islaeos3reverse, d2[(as.numeric(isltsss[i])-50):(as.numeric(isltsss[i])+150)])
+    islaeos3reverse<-rbind(islaeos3reverse, d2[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50)])
     #islaeos4reverse<-rbind(islaeos4reverse, matr1[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50),4])
     islgc200reverse<-rbind(islgc200reverse, (gc200matlab[(as.numeric(isltsss[i])-50):(as.numeric(isltsss[i])+150)]))
   }
@@ -242,9 +301,9 @@ for (i in 1:2000) {
     #  lowscoreaeos4forward<-rbind(lowscoreaeos4forward, matr1[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50),4])            
     lowscoregc200forward<-rbind(lowscoregc200forward, gc200matlab[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50)])
   } else {
-    lowscoreaeos1reverse<-rbind(lowscoreaeos1reverse, E02[(as.numeric(lowscoretsss[i])-50):(as.numeric(lowscoretsss[i])+150)])
+    lowscoreaeos1reverse<-rbind(lowscoreaeos1reverse, E02[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50)])
     # lowscoreaeos2reverse<-rbind(lowscoreaeos2reverse, matr1[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50),2])
-    lowscoreaeos3reverse<-rbind(lowscoreaeos3reverse, d2[(as.numeric(lowscoretsss[i])-50):(as.numeric(lowscoretsss[i])+150)])
+    lowscoreaeos3reverse<-rbind(lowscoreaeos3reverse, d2[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50)])
     #lowscoreaeos4reverse<-rbind(lowscoreaeos4reverse, matr1[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50),4])
     lowscoregc200reverse<-rbind(lowscoregc200reverse, (gc200matlab[(as.numeric(lowscoretsss[i])-50):(as.numeric(lowscoretsss[i])+150)]))
   }
