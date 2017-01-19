@@ -136,7 +136,7 @@ tsss<-c()
 seqs<-c()
 exp_strands<-c()
 exp_tsss<-c()
-#mpots<-c() #for experimentally found one
+exp_mpots_check<-c() #for experimentally found one
 exp_names<-c()
 
 for (i in 1:length(dataset_pro)){
@@ -145,7 +145,7 @@ for (i in 1:length(dataset_pro)){
   if (dataset_pro[[i]]$evidence=='experimental'){ 
     #exp_proms<-rbind(exp_proms, c(pro_names[i], strands[i], tsss[i], seqs[i]))
     exp_names<-c(exp_names, pro_names[i])
- #   mpots<-rbind(mpots, dataset_pro[[i]]$mpot)  	
+    exp_mpots_check<-rbind(exp_mpots_check, dataset_pro[[i]]$mpot)  	
     #exp_promoters<-rbind(exp_promoters, c(pro_names[i], strands[i], tsss[i], seqs[i]))
     exp_tsss<-c(exp_tsss, dataset_pro[[i]]$tss) 
     exp_strands<-c(exp_strands, dataset_pro[[i]]$strand)}
@@ -184,7 +184,7 @@ for (i in 1:length(exp_tsss)) {
     p<-lseqspline1D(substr(e.coli_U00096.2, exp_tsss[i]-250, exp_tsss[i]+150), bound=c(100, 300), ref=251 )
     mpotsforward<-rbind(mpotsforward, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[p$x %in% zout])
+                        p$mpot[])
     
      } else {
     aeos1reverse<-rbind(aeos1reverse, E02[(as.numeric(exp_tsss[i])-50):(as.numeric(exp_tsss[i])+150)])
@@ -198,7 +198,7 @@ for (i in 1:length(exp_tsss)) {
     p<-lseqspline1D(substr(reverseComplement_e.coli_U00096.2, exp_tsss[i]-250, exp_tsss[i]+150), bound=c(100, 300), ref=251 )
     mpotsreverse<-rbind(mpotsreverse, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[p$x %in% zout])
+                        p$mpot[])
     
     
     }
@@ -254,7 +254,7 @@ for (i in 1:length(nottsss)) {
     p<-lseqspline1D(substr(e.coli_U00096.2, nottsss[i]-250, nottsss[i]+150), bound=c(100, 300), ref=251 )
     notmpotsforward<-rbind(notmpotsforward, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[p$x %in% zout])
+                        p$mpot[])
     
             } else {
     notaeos1reverse<-rbind(notaeos1reverse, E02[(as.numeric(nottsss[i])-50):(as.numeric(nottsss[i])+150)])
@@ -267,7 +267,7 @@ for (i in 1:length(nottsss)) {
     p<-lseqspline1D(substr(reverseComplement_e.coli_U00096.2, nottsss[i]-250, nottsss[i]+150), bound=c(100, 300), ref=251 )
     notmpotsreverse-rbind(notmpotsreverse, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[p$x %in% zout])
+                        p$mpot[])
     
     
     
@@ -320,7 +320,7 @@ for (i in 1:length(dataset_gen)) {
    p<-lseqspline1D(substr(e.coli_U00096.2, gentsss[i]-250, gentsss[i]+150), bound=c(100, 300), ref=251 )
     genmpotsforward<-rbind(genmpotsforward, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[p$x %in% zout])
+                        p$mpot[])
     
         } else {
     genaeos1reverse<-rbind(genaeos1reverse, E02[(as.numeric(gentsss[i])-50):(as.numeric(gentsss[i])+150)])
@@ -333,7 +333,7 @@ for (i in 1:length(dataset_gen)) {
     p<-lseqspline1D(substr(reverseComplement_e.coli_U00096.2, gentsss[i]-250, gentsss[i]+150), bound=c(100, 300), ref=251 )
       genmpotsreverse<-rbind(genmpotsreverse, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[p$x %in% zout]) 
+                        p$mpot[]) 
     }
 }
 
@@ -381,7 +381,7 @@ for (i in 1:length(dataset_isl)) {
     p<-lseqspline1D(substr(e.coli_U00096.2, isltsss[i]-250, isltsss[i]+150), bound=c(100, 300), ref=251 )
     islmpotsforward<-rbind(islmpotsforward, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[p$x %in% zout]) 
+                        p$mpot[]) 
     
     } else {
     islaeos1reverse<-rbind(islaeos1reverse, E02[(as.numeric(isltsss[i])-50):(as.numeric(isltsss[i])+150)])
@@ -393,7 +393,7 @@ for (i in 1:length(dataset_isl)) {
     p<-lseqspline1D(substr(reverseComplement_e.coli_U00096.2, isltsss[i]-250, isltsss[i]+150), bound=c(100, 300), ref=251 )
     islmpotsreverse<-rbind(islmpotsreverse, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[p$x %in% zout]) 
+                        p$mpot[]) 
     
     }
 }
@@ -451,7 +451,7 @@ for (i in 1:2000) {
       p<-lseqspline1D(substr(e.coli_U00096.2, lowscoretsss[i]-250, lowscoretsss[i]+150), bound=c(100, 300), ref=251 )
     lowscorempotsforward<-rbind(lowscorempotsforward, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[p$x %in% zout]) 
+                        p$mpot[]) 
     
       } else {
     lowscoreaeos1reverse<-rbind(lowscoreaeos1reverse, E02[(as.numeric(lowscoretsss[i])-50):(as.numeric(lowscoretsss[i])+150)])
@@ -463,7 +463,7 @@ for (i in 1:2000) {
          p<-lseqspline1D(substr(reverseComplement_e.coli_U00096.2, lowscoretsss[i]-250, lowscoretsss[i]+150), bound=c(100, 300), ref=251 )
     lowscorempotsreverse<-rbind(lowscorempotsreverse, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[p$x %in% zout]) 
+                        p$mpot[]) 
     
     }
 }
@@ -589,9 +589,9 @@ Futher transformation - chosen number of 'rotation' columns (i.e. eigenvectors a
 #general PCA results visualization
 habillage i.e.  partitions into groups
 ```{r}
-#svg(filename = 'PCA_5_components_4_properties_not_conversion_into_variables_axes_1_2.svg', width = 10, height = 7)
+svg(filename = 'PCA_5_components_4_properties_not_conversion_into_variables_axes_1_2.svg', width = 10, height = 7)
 fviz_pca_ind(princ.return.5comps.4props, label="none", habillage=habillage_5components_4props, pointsize = 0.5, addEllipses = T, ellipse.level = 0.99)
-#dev.off()
+dev.off()
 
 svg(filename = 'PCA_5_components_4_properties_not_conversion_into_variables_axes_1_3.svg', width = 10, height = 7)
 fviz_pca_ind(princ.return.5comps.4props, axes = c(1,3), label="none", habillage=habillage_5components_4props, pointsize = 0.5, addEllipses = T, ellipse.level = 0.99)
@@ -611,12 +611,19 @@ habillage.pro.not.isl.gen<-c(rep('red', length(exp_names)), rep ('blue', length(
 
 
 
-#plot3d(princ.return.pro.not.isl.gen.aeos3$x[,1:3], col=(habillage.pro.not.isl.gen), size=1)
-# #pca3d
+
+
+open3d()
+plot3d(princ.return.5comps.4props$x[,1:3], col=(habillage.pro.not.isl.gen), size=1)
+
+M <- par3d("userMatrix") # #pca3d
+movie3d( spin3d(), duration=15, dir="/home/mikhail/Documents/Script_2016_all/PCA/pca_movie3d/", clean = T, convert = T ) 
+
 # #
 library(pca3d)
 pca3d(princ.return.5comps.4props, group = habillage.pro.not.isl.gen, col = habillage.pro.not.isl.gen, radius = 0.5)
 #makeMoviePCA()
+
 ```
 
 
@@ -764,3 +771,52 @@ predictionProb_promoters_vs_genes <- predict(fit_promoters_vs_genes, newdata = t
 confusionMatrix_promoters_vs_genes <- confusionMatrix(data = predictionClasses_promoters_vs_genes, testing$factor_to_promoters_vs_genes)
 
 ```
+
+Mean values for used properties for sequences sets
+
+```{r}
+aes<-grep('*aeos1$', ls(), value = T)[c(1,5,2,3,4)]
+
+meanaes<-c()
+
+for (i in aes) {
+  meanaes<-c(meanaes, mean(get(i)))
+
+}
+
+names(meanaes)<-c('Promoters', 'Non-promoters', 'Genes', 'Islands', 'Lowscore')
+names(medianaes)<-c('Promoters', 'Non-promoters', 'Genes', 'Islands', 'Lowscore')
+
+
+ds<-grep('*aeos3$', ls(), value = T)[c(1,5,2,3,4)]
+
+meands<-c()
+for (i in ds) {
+  meands<-c(meands, mean(get(i)))
+}
+
+names(meands)<-c('Promoters', 'Non-promoters', 'Genes', 'Islands', 'Lowscore')
+
+
+eps<-grep('*mpots$', ls(), value = T)[c(1,5,2,3,4)]
+
+meaneps<-c()
+for (i in eps) {
+  meaneps<-c(meaneps, mean(get(i)))
+}
+
+names(meaneps)<-c('Promoters', 'Non-promoters', 'Genes', 'Islands', 'Lowscore')
+
+gcs<-grep('*gc200$', ls(), value = T)[c(1,5,2,3,4)]
+
+meangcs<-c()
+for (i in gcs) {
+  meangcs<-c(meangcs, mean(get(i)))
+}
+
+names(meangcs)<-c('Promoters', 'Non-promoters', 'Genes', 'Islands', 'Lowscore')
+
+
+
+```
+
