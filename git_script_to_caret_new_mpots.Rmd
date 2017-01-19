@@ -120,7 +120,7 @@ load('spline_dataset_gen.Rdata')
 load('spline_dataset_isl.Rdata')
 load('dataset_lowscore.Rdata')
 
-
+##dataset_notpro[[1488]]<-NULL # to close to the left flank
 ```
 
 
@@ -154,23 +154,22 @@ for (i in 1:length(dataset_pro)){
 
 # # # Changing genomic coordinate used for dataset_... - TSS is according to 5'-end for both strands 
 ```{r}
-exp_tsss<-nchar(e.coli_U00096.2)-exp_tsss
+
+exp_tsss[which(exp_strands=='reverse')]<-nchar(e.coli_U00096.2)-exp_tsss[which(exp_strands=='reverse')]
+#exp_tsss<--exp_tsss
 ```
 
 
 Creating matrices for data on activation energy ('aeos1') and size ('aeos3'). The matrices is 699*201 - 699 promoters sequences, 201 value for a physical property profile
 to 5'-end for both strands 
+
+
+Creating matrices of dynamical properties and GC-content for intervals [-150; 50] nts
 ```{r} 
 for (i in c('aeos1forward', 'aeos1reverse', 'aeos3forward', 'aeos3reverse', 'gc200forward', 'gc200reverse', 'mpotsforward', 'mpotsreverse')) {
   assign(i, c())
 }
-```
-
-
-
-Creating matrices of dynamical properties and GC-content for intervals [-150; 50] nts
-```{r}
-zout<--150:50
+zout<- -480:239
 
 
 for (i in 1:length(exp_tsss)) {
@@ -181,10 +180,10 @@ for (i in 1:length(exp_tsss)) {
     #aeos4forward<-rbind(aeos4forward, matr1[(as.numeric(exp_proms[i,3])-150):(as.numeric(exp_proms[i,3])+50),4])            
     gc200forward<-rbind(gc200forward, gc200matlab1[(as.numeric(exp_tsss[i])-150):(as.numeric(exp_tsss[i])+50)])
     
-    p<-lseqspline1D(substr(e.coli_U00096.2, exp_tsss[i]-250, exp_tsss[i]+150), bound=c(100, 300), ref=251 )
+    p<-lseqspline1D(substr(e.coli_U00096.2, exp_tsss[i]-250, exp_tsss[i]+150), bound=c(50, 350), ref=251 )
     mpotsforward<-rbind(mpotsforward, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[])
+                        p$mpot[p$x %in% zout])
     
      } else {
     aeos1reverse<-rbind(aeos1reverse, E02[(as.numeric(exp_tsss[i])-50):(as.numeric(exp_tsss[i])+150)])
@@ -195,10 +194,10 @@ for (i in 1:length(exp_tsss)) {
     
     
     
-    p<-lseqspline1D(substr(reverseComplement_e.coli_U00096.2, exp_tsss[i]-250, exp_tsss[i]+150), bound=c(100, 300), ref=251 )
+    p<-lseqspline1D(substr(reverseComplement_e.coli_U00096.2, exp_tsss[i]-250, exp_tsss[i]+150), bound=c(50, 350), ref=251 )
     mpotsreverse<-rbind(mpotsreverse, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[])
+                        p$mpot[p$x %in% zout])
     
     
     }
@@ -216,23 +215,27 @@ mpots<-rbind(mpotsforward, mpotsreverse)
 ```
 
 
-extracting data for non-promoters
+extracting data for non-promoters. 1488 th sequences remove since it is 188 nts from flank and EP cannot be calculated
 ```{r}
+
+
 notpro_names<-names(dataset_notpro)
-nottsss<-c()
-notseqs<-c
+nottsss<-rep(0, length(dataset_notpro))
+notseqs<-c()
 notstrands<-c()
 #notmpots<-c()
 
 for (i in 1:length(dataset_notpro)){
-  nottsss<-c(nottsss, dataset_notpro[[i]]$tss)
+  nottsss[i]<-dataset_notpro[[i]]$tss
   notseqs<-toupper(c(notseqs, dataset_notpro[[i]]$seq))
   notstrands<-c(notstrands, dataset_notpro[[i]]$strand)
  # notmpots<-rbind(notmpots,  dataset_notpro[[i]]$mpot)  
 }
 
-# # #
-nottsss<-nchar(e.coli_U00096.2)-nottsss
+# # # no reverse strand!
+#nottsss[which(notstrands=='reverse')]<-nchar(e.coli_U00096.2)-nottsss[which(notstrands=='reverse')]
+
+#nottsss<-nchar(e.coli_U00096.2)-nottsss
 ```
 Matrices for physical properties profiles - creating matrices for data on activation energy ('aeos1') and size ('aeos3')
 ```{r}
@@ -240,34 +243,45 @@ Matrices for physical properties profiles - creating matrices for data on activa
 for (i in c('notaeos1forward', 'notaeos1reverse', 'notaeos3forward', 'notaeos3reverse', 'notgc200forward', 'notgc200reverse', 'notmpotsforward', 'notmpotsreverse')) {
   assign(i, c())
 }
-```
 
-```{r}
 for (i in 1:length(nottsss)) {
   if (notstrands[i]=='forward') {
+                if (nottsss[i]<250) {
+                  
+                  
+                spec_for1488<-substr(
+                paste0(substr(e.coli_U00096.2, nchar(e.coli_U00096.2)-199, nchar(e.coli_U00096.2)), e.coli_U00096.2), 
+                nottsss[i]-250+200, nottsss[i]+150+200)
+                
+                
+                p<-lseqspline1D(spec_for1488, bound=c(50, 350), ref=251 )
+                notmpotsforward<-rbind(notmpotsforward, 
+                p$mpot[p$x %in% zout])
+  
+                } else {
     notaeos1forward<-rbind(notaeos1forward, E01[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50)])
     #notaeos2forward<-rbind(notaeos2forward, matr1[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50),2])
     notaeos3forward<-rbind(notaeos3forward, d1[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50)])
     #notaeos4forward<-rbind(notaeos4forward, matr1[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50),4])			
     notgc200forward<-rbind(notgc200forward, gc200matlab1[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50)])
   
-    p<-lseqspline1D(substr(e.coli_U00096.2, nottsss[i]-250, nottsss[i]+150), bound=c(100, 300), ref=251 )
+    p<-lseqspline1D(substr(e.coli_U00096.2, nottsss[i]-250, nottsss[i]+150), bound=c(50, 350), ref=251 )
     notmpotsforward<-rbind(notmpotsforward, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[])
-    
-            } else {
-    notaeos1reverse<-rbind(notaeos1reverse, E02[(as.numeric(nottsss[i])-50):(as.numeric(nottsss[i])+150)])
+                        p$mpot[p$x %in% zout])
+  }
+        #    } else {
+  #  notaeos1reverse<-rbind(notaeos1reverse, E02[(as.numeric(nottsss[i])-50):(as.numeric(nottsss[i])+150)])
     #notaeos2reverse<-rbind(notaeos2reverse, matr1[(as.numeric(nottsss[i])-50):(as.numeric(nottsss[i])+150),2])
-    notaeos3reverse<-rbind(notaeos3reverse, d2[(as.numeric(nottsss[i])-50):(as.numeric(nottsss[i])+150)])
+   # notaeos3reverse<-rbind(notaeos3reverse, d2[(as.numeric(nottsss[i])-50):(as.numeric(nottsss[i])+150)])
     #notaeos4reverse<-rbind(notaeos4reverse, matr1[(as.numeric(nottsss[i])-50):(as.numeric(nottsss[i])+150),4])
-    notgc200reverse<-rbind(notgc200reverse, (gc200matlab2[(as.numeric(nottsss[i])-50):(as.numeric(nottsss[i])+150)]))
+   # notgc200reverse<-rbind(notgc200reverse, (gc200matlab2[(as.numeric(nottsss[i])-50):(as.numeric(nottsss[i])+150)]))
     
     
-    p<-lseqspline1D(substr(reverseComplement_e.coli_U00096.2, nottsss[i]-250, nottsss[i]+150), bound=c(100, 300), ref=251 )
-    notmpotsreverse-rbind(notmpotsreverse, 
+  #  p<-lseqspline1D(substr(reverseComplement_e.coli_U00096.2, nottsss[i]-250, nottsss[i]+150), bound=c(50, 350), ref=251 )
+   # notmpotsreverse-rbind(notmpotsreverse, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[])
+                #        p$mpot[p$x %in% zout])
     
     
     
@@ -281,7 +295,7 @@ notaeos3<-notaeos3forward
 #notaeos4<-notaeos4forward
 notgc200<-notgc200forward
 
-notmpots<-rbind(notmpotsforward, notmpotsreverse)
+notmpots<-notmpotsforward
 ```
 Data extracion for genes
 
@@ -301,8 +315,9 @@ for (i in 1:length(dataset_gen)){
 ```
 
 ```{r}
+# # #
+gentsss[which(genstrands=='reverse')]<-nchar(e.coli_U00096.2)-gentsss[which(genstrands=='reverse')]
 
-gentsss<-nchar(e.coli_U00096.2)-gentsss
 
 for (i in c('genaeos1forward', 'genaeos1reverse', 'genaeos3forward', 'genaeos3reverse', 'gengc200forward', 'gengc200reverse', 'genmpotsforward', 'genmpotsreverse' )) {
   assign(i, c())
@@ -317,10 +332,10 @@ for (i in 1:length(dataset_gen)) {
     gengc200forward<-rbind(gengc200forward, gc200matlab1[(as.numeric(gentsss[i])-150):(as.numeric(gentsss[i])+50)])
     
     
-   p<-lseqspline1D(substr(e.coli_U00096.2, gentsss[i]-250, gentsss[i]+150), bound=c(100, 300), ref=251 )
+   p<-lseqspline1D(substr(e.coli_U00096.2, gentsss[i]-250, gentsss[i]+150), bound=c(50, 350), ref=251 )
     genmpotsforward<-rbind(genmpotsforward, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[])
+                        p$mpot[p$x %in% zout])
     
         } else {
     genaeos1reverse<-rbind(genaeos1reverse, E02[(as.numeric(gentsss[i])-50):(as.numeric(gentsss[i])+150)])
@@ -330,10 +345,10 @@ for (i in 1:length(dataset_gen)) {
     gengc200reverse<-rbind(gengc200reverse, (gc200matlab2[(as.numeric(gentsss[i])-50):(as.numeric(gentsss[i])+150)]))
    
     
-    p<-lseqspline1D(substr(reverseComplement_e.coli_U00096.2, gentsss[i]-250, gentsss[i]+150), bound=c(100, 300), ref=251 )
+    p<-lseqspline1D(substr(reverseComplement_e.coli_U00096.2, gentsss[i]-250, gentsss[i]+150), bound=c(50, 350), ref=251 )
       genmpotsreverse<-rbind(genmpotsreverse, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[]) 
+                        p$mpot[p$x %in% zout]) 
     }
 }
 
@@ -361,7 +376,9 @@ for (i in 1:length(dataset_isl)){
  # islmpots<-rbind(islmpots, dataset_isl[[i]]$mpot)
 }
 
-isltsss<-nchar(e.coli_U00096.2)-isltsss
+# # #
+
+isltsss[which(islstrands=='reverse')]<-nchar(e.coli_U00096.2)-isltsss[which(islstrands=='reverse')]
 ```
 
 ```{r}
@@ -378,10 +395,10 @@ for (i in 1:length(dataset_isl)) {
     #  islaeos4forward<-rbind(islaeos4forward, matr1[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50),4])            
     islgc200forward<-rbind(islgc200forward, gc200matlab1[(as.numeric(isltsss[i])-150):(as.numeric(isltsss[i])+50)])
     
-    p<-lseqspline1D(substr(e.coli_U00096.2, isltsss[i]-250, isltsss[i]+150), bound=c(100, 300), ref=251 )
+    p<-lseqspline1D(substr(e.coli_U00096.2, isltsss[i]-250, isltsss[i]+150), bound=c(50, 350), ref=251 )
     islmpotsforward<-rbind(islmpotsforward, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[]) 
+                        p$mpot[p$x %in% zout]) 
     
     } else {
     islaeos1reverse<-rbind(islaeos1reverse, E02[(as.numeric(isltsss[i])-50):(as.numeric(isltsss[i])+150)])
@@ -390,10 +407,10 @@ for (i in 1:length(dataset_isl)) {
     #islaeos4reverse<-rbind(islaeos4reverse, matr1[(as.numeric(isltsss[i])-50):(as.numeric(isltsss[i])+150),4])
     islgc200reverse<-rbind(islgc200reverse, (gc200matlab2[(as.numeric(isltsss[i])-50):(as.numeric(isltsss[i])+150)]))
   
-    p<-lseqspline1D(substr(reverseComplement_e.coli_U00096.2, isltsss[i]-250, isltsss[i]+150), bound=c(100, 300), ref=251 )
+    p<-lseqspline1D(substr(reverseComplement_e.coli_U00096.2, isltsss[i]-250, isltsss[i]+150), bound=c(50, 350), ref=251 )
     islmpotsreverse<-rbind(islmpotsreverse, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[]) 
+                        p$mpot[p$x %in% zout]) 
     
     }
 }
@@ -425,7 +442,9 @@ for (i in 1:2000){
  # lowscorempots<-rbind(lowscorempots, dataset_lowscore[[i]]$mpot)
 }
 
-lowscoretsss<-nchar(e.coli_U00096.2)-lowscoretsss
+# # #
+
+lowscoretsss[which(lowscorestrands=='reverse')]<-nchar(e.coli_U00096.2)-lowscoretsss[which(lowscorestrands=='reverse')]
 ```
 
 
@@ -448,10 +467,10 @@ for (i in 1:2000) {
     #  lowscoreaeos4forward<-rbind(lowscoreaeos4forward, matr1[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50),4])            
     lowscoregc200forward<-rbind(lowscoregc200forward, gc200matlab1[(as.numeric(lowscoretsss[i])-150):(as.numeric(lowscoretsss[i])+50)])
 
-      p<-lseqspline1D(substr(e.coli_U00096.2, lowscoretsss[i]-250, lowscoretsss[i]+150), bound=c(100, 300), ref=251 )
+      p<-lseqspline1D(substr(e.coli_U00096.2, lowscoretsss[i]-250, lowscoretsss[i]+150), bound=c(50, 350), ref=251 )
     lowscorempotsforward<-rbind(lowscorempotsforward, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[]) 
+                        p$mpot[p$x %in% zout]) 
     
       } else {
     lowscoreaeos1reverse<-rbind(lowscoreaeos1reverse, E02[(as.numeric(lowscoretsss[i])-50):(as.numeric(lowscoretsss[i])+150)])
@@ -460,10 +479,10 @@ for (i in 1:2000) {
     #lowscoreaeos4reverse<-rbind(lowscoreaeos4reverse, matr1[(as.numeric(lowscoretsss[i])-50):(as.numeric(lowscoretsss[i])+150),4])
     lowscoregc200reverse<-rbind(lowscoregc200reverse, (gc200matlab2[(as.numeric(lowscoretsss[i])-50):(as.numeric(lowscoretsss[i])+150)]))
   
-         p<-lseqspline1D(substr(reverseComplement_e.coli_U00096.2, lowscoretsss[i]-250, lowscoretsss[i]+150), bound=c(100, 300), ref=251 )
+         p<-lseqspline1D(substr(reverseComplement_e.coli_U00096.2, lowscoretsss[i]-250, lowscoretsss[i]+150), bound=c(50, 350), ref=251 )
     lowscorempotsreverse<-rbind(lowscorempotsreverse, 
                         ##mpot_whole_genome_forward$mpot[mpot_whole_genome_forward$x %in% (exp_tsss[i]-150):(exp_tsss[i]+50)])
-                        p$mpot[]) 
+                        p$mpot[p$x %in% zout]) 
     
     }
 }
