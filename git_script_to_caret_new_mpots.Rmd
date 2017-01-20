@@ -247,7 +247,12 @@ for (i in c('notaeos1forward', 'notaeos1reverse', 'notaeos3forward', 'notaeos3re
 for (i in 1:length(nottsss)) {
   if (notstrands[i]=='forward') {
                 if (nottsss[i]<250) {
-                  
+                  notaeos1forward<-rbind(notaeos1forward, E01[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50)])
+    #notaeos2forward<-rbind(notaeos2forward, matr1[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50),2])
+    notaeos3forward<-rbind(notaeos3forward, d1[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50)])
+    #notaeos4forward<-rbind(notaeos4forward, matr1[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50),4])			
+    notgc200forward<-rbind(notgc200forward, gc200matlab1[(as.numeric(nottsss[i])-150):(as.numeric(nottsss[i])+50)])
+  
                   
                 spec_for1488<-substr(
                 paste0(substr(e.coli_U00096.2, nchar(e.coli_U00096.2)-199, nchar(e.coli_U00096.2)), e.coli_U00096.2), 
